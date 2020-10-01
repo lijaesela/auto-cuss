@@ -79,22 +79,22 @@ pluralize n s
    | n == 1    = base
    | otherwise = base ++ "s"
    where
-      base = (show n) ++ " " ++ s
+      base = show n ++ " " ++ s
 
 cuss :: String -> [Float] -> String
 cuss s d
-   | ol == []  = "The distribution of " ++ s ++ " has no outliers."
-   | otherwise = "The distribution of " ++ s ++ " has " ++ num ++ " at " ++ (engList ol)
+   | null ol   = "The distribution of " ++ s ++ " has no outliers."
+   | otherwise = "The distribution of " ++ s ++ " has " ++ num ++ " at " ++ engList ol
    where
       ol  = outliers d
       num = pluralize (length ol) "outlier"
 
 engList :: [Float] -> String
 engList l
-   | ln == 0   = "... uhhhh... umm... uhhh..."
+   | ln == 0   = "nothing"
    | ln == 1   = dropDec $ show $ head l
-   | ln == 2   = (dropDec $ show $ head l) ++ " and " ++ (dropDec $ show $ last l)
-   | otherwise = concat $ chNth (ln*2-3) ", and " $ intersperse ", " $ map dropDec $ map show l
+   | ln == 2   = dropDec (show $ head l) ++ " and " ++ dropDec (show $ last l)
+   | otherwise = concat $ chNth (ln*2-3) ", and " $ intersperse ", " $ map (dropDec . show) l
    where
       ln = length l
 
@@ -126,11 +126,11 @@ main = do
    let title = head $ lines file
    let set   = sort $ strFloat $ tail $ lines file
    --hPutStrLn stderr $ "\ESC[31mfor data:\n" ++ (show set) ++ "\ESC[m\n"
-   putStrLn $ "Minimum:  " ++ (dropDec $ show $ minimum   set)
-   putStrLn $ "Q1:       " ++ (dropDec $ show $ getQ1     set)
-   putStrLn $ "Median:   " ++ (dropDec $ show $ getMedian set)
-   putStrLn $ "Q3:       " ++ (dropDec $ show $ getQ3     set)
-   putStrLn $ "Maximum:  " ++ (dropDec $ show $ maximum   set)
-   putStrLn $ "Mean:     " ++ (dropDec $ show $ getMean   set)
-   putStrLn $ "Outliers: " ++ (unwords $ map dropDec $ map show $ outliers set)
-   hPutStrLn stderr $ "\ESC[34;1m" ++ (cuss title set) ++ "\ESC[m"
+   putStrLn $ "Minimum:  " ++ dropDec (show $ minimum   set)
+   putStrLn $ "Q1:       " ++ dropDec (show $ getQ1     set)
+   putStrLn $ "Median:   " ++ dropDec (show $ getMedian set)
+   putStrLn $ "Q3:       " ++ dropDec (show $ getQ3     set)
+   putStrLn $ "Maximum:  " ++ dropDec (show $ maximum   set)
+   putStrLn $ "Mean:     " ++ dropDec (show $ getMean   set)
+   putStrLn $ "Outliers: " ++ unwords (map (dropDec . show) (outliers set))
+   hPutStrLn stderr $ "\ESC[34;1m" ++ cuss title set ++ "\ESC[m"
